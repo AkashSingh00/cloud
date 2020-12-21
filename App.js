@@ -9,12 +9,23 @@ import MusicControl from 'react-native-music-control'
 import MapboxGL from '@react-native-mapbox-gl/maps'
 import SendSMS from 'react-native-sms-x'
 
-MapboxGL.setAccessToken(`${config.API_TOKEN}`)
-MapboxGL.setTelemetryEnabled(false)
-
 import Main from './components/Main'
 import Metrics from './components/Metrics'
 import Window from './components/Window'
+
+MapboxGL.setAccessToken(`${config.API_TOKEN}`)
+MapboxGL.setTelemetryEnabled(false)
+
+const ROOT_URL = "https://api.mapbox.com/geocoding/v5"
+const SEARCH_ENDPOINT = "mapbox.places"
+
+const getCurrentLocality = async () => {
+  try {
+    let response = await fetch(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.latitude},${this.state.longitude}.json?types=locality&access_token=${config.API_TOKEN}`)
+    let json = await response.json()
+    return json.features[0].text
+  } catch (error) { console.error(error) }
+}
 
 export default class App extends Component {
 
@@ -83,9 +94,6 @@ export default class App extends Component {
     })
 
   }
-
-// http request for address
-// `https://api.mapbox.com/geocoding/v5/mapbox.places/${this.state.latitude}%2C${this.state.longitude}.json?access_token=${config.API_TOKEN}`
 
   componentWillUnmount() {
     volumeListener.remove()
