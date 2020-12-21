@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, Text, Button, Image, Alert } from 'react-native'
+import { View, StyleSheet, Text, Button, Image, TouchableOpacity } from 'react-native'
 import Slider from 'react-native-unlock-slider'
 
 const Main = (props) => {
@@ -15,16 +15,18 @@ const Main = (props) => {
           </View>
         </View>
         <View style={styles.start}>
-          <View style={styles.button}>
-            <Image
-              style={{
-                width: 20,
-                height: 20,
-                marginRight: 5
-              }}
-              source={require('../../assets/navigation_white_48dp/2x/baseline_navigation_white_48dp.png')}/>
-            <Text style={{color: 'white', marginRight: 6}}>Start</Text>
-          </View>
+          <TouchableOpacity onPress={props.startNavigation}>
+            <View style={styles.button}>
+              <Image
+                style={{
+                  width: 20,
+                  height: 20,
+                  marginRight: 5
+                }}
+                source={require('../../assets/navigation_white_48dp/2x/baseline_navigation_white_48dp.png')}/>
+              <Text style={{color: 'white', marginRight: 6}}>Start</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
       <View style={styles.emergency}>
@@ -33,7 +35,7 @@ const Main = (props) => {
           childrenContainer={{ backgroundColor: 'rgba(255, 255, 255, 0.0)' }}
           slideOverStyle={{ backgroundColor: '#F64C46' }}
           onEndReached={() => {
-            Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
+            props.emergencyEvent()
           }}
           isOpacityChangeOnSlide={true}
           containerStyle={{
@@ -108,8 +110,3 @@ const styles = StyleSheet.create({
 })
 
 export default Main
-
-
-        // <TouchableOpacity style={styles.button} onPress={this.sendSMSFunction.bind(this)}>
-        //   <Text>Send SMS</Text>
-        // </TouchableOpacity>

@@ -25,7 +25,7 @@ export default class App extends Component {
   constructor() {
     super()
     this.state = {
-      isPlaying: true,
+      username: '___',
       startTime: new Date(),
       elapsedTime: '00:00:00',
       emergencyMessageSent: false,
@@ -52,41 +52,15 @@ export default class App extends Component {
 
     // VolumeControl.change(0.5)
 
-    let counter = 0
-
     setInterval(() => {
       axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
         .then(response => this.setState({ locality: response.data.features[0].text }))
         .catch(err => console.error(`ERROR: ${err}`))
     }, 10000)
 
-    setInterval(() => {
-
-      this.setState({ elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss') })
-
-      if ( this.state.emergencyMessageSent ) {
-        MusicControl.setNowPlaying({
-          title: 'Emergency Message Sent',
-          artist: '',
-          color: 0xff0000,
-        })
-      } else {
-        MusicControl.setNowPlaying({
-          title: `${this.state.street}`,
-          artist: `${this.state.elapsedTime}`
-        })
-      }
-
-    }, 1000)
-
     const volumeListener = VolumeControlEvents.addListener("VolumeChanged", (event)=> {
       if ( event.volume <= 0 && !this.state.emergencyMessageSent) {
-        this.setState({ emergencyMessageSent: true })
-        Vibration.vibrate(1000)
-        SendSMS.send(123, "+919630997999", 
-          `https://www.google.com/maps/@${this.state.latitude},${this.state.longitude},15z`, (msg)=>{
-          Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
-        })
+        this.emergencyEvent()
       }
     })
 
@@ -94,6 +68,41 @@ export default class App extends Component {
 
   componentWillUnmount() {
     volumeListener.remove()
+  }
+
+  startNavigation() {
+    let counter = 0
+    setInterval((counter) => {
+      this.setState({ elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss') })
+      MusicControl.setNowPlaying({
+        title: `${this.state.locality}`,
+        artist: `${this.state.elapsedTime}`
+      })
+    }, 1000)
+  }
+
+  emergencyEvent() {
+
+    this.setState({ emergencyMessageSent: true })
+
+    Vibration.vibrate(1000)
+
+    const helpTex = `!!!EMERGENCY SOS!!!
+      ${this.state.username} has made an emergency trigger from this approximate location.
+      https://www.google.com/maps/@${this.state.latitude},${this.state.longitude},15z
+    `
+
+    SendSMS.send(123, "+919630997999", 
+      helpTex, (msg)=>{
+      Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
+    })
+
+    MusicControl.setNowPlaying({
+      title: 'Emergency Message Sent',
+      artist: '',
+      color: 0xff0000,
+    })
+
   }
 
   render() {
@@ -138,7 +147,9 @@ export default class App extends Component {
             <Main 
               locality={this.state.locality}
               longitude={this.state.longitude}
-              latitude={this.state.latitude} />
+              latitude={this.state.latitude} 
+              startNavigation={this.startNavigation.bind(this)}
+              emergencyEvent={this.emergencyEvent.bind(this)}/>
           </View>
         </View>
       </View>
