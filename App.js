@@ -75,13 +75,17 @@ export default class App extends Component {
       if ( event.volume <= 0 && !this.state.emergencyMessageSent) {
         this.setState({ emergencyMessageSent: true })
         Vibration.vibrate(1000)
-        SendSMS.send(123, "+919630997999", "test", (msg)=>{
+        SendSMS.send(123, "+919630997999", 
+          `https://www.google.com/maps/@${this.state.latitude},${this.state.longitude},15z`, (msg)=>{
           Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
         })
       }
     })
 
   }
+
+// http request for address
+// `https://api.mapbox.com/geocoding/v5/mapbox.places/${this.state.latitude}%2C${this.state.longitude}.json?access_token=${config.API_TOKEN}`
 
   componentWillUnmount() {
     volumeListener.remove()
@@ -99,6 +103,7 @@ export default class App extends Component {
             {this.state.permissionIsGranted && 
               <MapboxGL.UserLocation 
                 onUpdate={(data)=>{
+                  this.setState({ longitude: data.coords.longitude, latitude: data.coords.latitude })
                   this.camera.setCamera({
                     centerCoordinate: [data.coords.longitude, data.coords.latitude],
                     zoomLevel: 16,
