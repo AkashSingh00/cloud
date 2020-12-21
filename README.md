@@ -24,3 +24,10 @@ https://github.com/crazycodeboy/react-native-splash-screen
 
 change the gradel version of react-native-volume-control to 3.4.0
 
+
+Create config.js in the root of this project and save your [Mapbox access token](https://docs.mapbox.com/help/how-mapbox-works/access-tokens/) there
+```js
+export const config = {
+  API_TOKEN: "your_mapbox_api_key_here",
+}
+```
