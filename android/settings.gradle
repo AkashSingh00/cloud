@@ -1,0 +1,9 @@
+rootProject.name = 'cloud'
+include ':@react-native-mapbox-gl_maps'
+project(':@react-native-mapbox-gl_maps').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-mapbox-gl/maps/android/rctmgl')
+include ':react-native-music-control'
+project(':react-native-music-control').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-music-control/android')
+include ':react-native-volume-control'
+project(':react-native-volume-control').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-volume-control/android')
+
+include ':app'
