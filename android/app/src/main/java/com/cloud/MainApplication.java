@@ -3,6 +3,7 @@ package com.cloud;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.someone.sendsms.SendSMSPackage;
 import com.mapbox.rctmgl.RCTMGLPackage;
 import com.tanguyantoine.react.MusicControl;
 import com.rtmalone.volumecontrol.RNVolumeControlPackage;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new SendSMSPackage(),
             new RCTMGLPackage(),
             new MusicControl(),
             new RNVolumeControlPackage()

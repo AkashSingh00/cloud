@@ -3,10 +3,11 @@ import { config } from './config.js'
 import moment from 'moment'
 
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, Vibration, PermissionsAndroid } from 'react-native'
+import { StyleSheet, Text, View, Vibration, PermissionsAndroid, Alert } from 'react-native'
 import VolumeControl, { VolumeControlEvents } from 'react-native-volume-control'
 import MusicControl from 'react-native-music-control'
 import MapboxGL from '@react-native-mapbox-gl/maps'
+import SendSMS from 'react-native-sms-x'
 
 MapboxGL.setAccessToken(`${config.API_TOKEN}`)
 MapboxGL.setTelemetryEnabled(false)
@@ -33,10 +34,10 @@ export default class App extends Component {
 
   componentDidMount() {
 
-
     PermissionsAndroid.requestMultiple(
       [PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION],
+      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+      PermissionsAndroid.PERMISSIONS.SEND_SMS],
       {
         title: 'Give Location Permission',
         message: 'App needs location permission to find your position.'
@@ -45,7 +46,7 @@ export default class App extends Component {
     .then( granted => this.setState({ permissionIsGranted: granted }) )
     .catch( err => console.warn(err) )
 
-    // VolumeControl.change(1)
+    // VolumeControl.change(0.5)
 
     let counter = 0
 
@@ -71,9 +72,12 @@ export default class App extends Component {
     }, 1000)
 
     const volumeListener = VolumeControlEvents.addListener("VolumeChanged", (event)=> {
-      if ( event.volume <= 0 ) {
+      if ( event.volume <= 0 && !this.state.emergencyMessageSent) {
         this.setState({ emergencyMessageSent: true })
         Vibration.vibrate(1000)
+        SendSMS.send(123, "+919630997999", "test", (msg)=>{
+          Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
+        })
       }
     })
 
@@ -95,7 +99,6 @@ export default class App extends Component {
             {this.state.permissionIsGranted && 
               <MapboxGL.UserLocation 
                 onUpdate={(data)=>{
-                  console.log([data.coords.longitude, data.coords.latitude])
                   this.camera.setCamera({
                     centerCoordinate: [data.coords.longitude, data.coords.latitude],
                     zoomLevel: 16,

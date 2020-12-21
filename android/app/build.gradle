@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-sms-x')
     implementation project(':@react-native-mapbox-gl_maps')
     implementation project(':react-native-music-control')
     implementation project(':react-native-volume-control')

@@ -107,3 +107,8 @@ const styles = StyleSheet.create({
 })
 
 export default Main
+
+
+        // <TouchableOpacity style={styles.button} onPress={this.sendSMSFunction.bind(this)}>
+        //   <Text>Send SMS</Text>
+        // </TouchableOpacity>
