@@ -5,35 +5,31 @@ import Carousel from 'react-native-snap-carousel'
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window')
 
-export default class Metrics extends Component {
+const Metrics = (props) => {
 
-  constructor() {
-    super()
-    this.state = {
-      entries: [
-        {
-          title: "Avg Speed",
-          value: '22.32km/hr',
-          img: require('../../assets/directions_bike_black_48dp/2x/baseline_directions_bike_black_48dp.png' )
-        },
-        {
-          title: "Distance",
-          value: '12.56km',
-          img: require('../../assets/theaters_black_48dp/2x/baseline_theaters_black_48dp.png' )
-        },
-        {
-          title: "Estimated Time",
-          value: '00:28:04',
-          img: require('../../assets/schedule_black_48dp/2x/baseline_schedule_black_48dp.png' )
-        },
-        {
-          title: "Max Speed",
-          value: '26.92km/hr',
-          img: require('../../assets/electric_bike_black_48dp/2x/baseline_electric_bike_black_48dp.png' )
-        },
-      ]
+  // this.setState({entries[2].value: this.props.elapsedTime})
+  const entries = [
+    {
+      title: "Avg Speed",
+      value: `${props.avgSpeed}km/hr`,
+      img: require('../../assets/directions_bike_black_48dp/2x/baseline_directions_bike_black_48dp.png' )
+    },
+    {
+      title: "Distance",
+      value: `${props.distance}km`,
+      img: require('../../assets/theaters_black_48dp/2x/baseline_theaters_black_48dp.png' )
+    },
+    {
+      title: "Estimated Time",
+      value: `${props.elapsedTime}`,
+      img: require('../../assets/schedule_black_48dp/2x/baseline_schedule_black_48dp.png' )
+    },
+    {
+      title: "Max Speed",
+      value: `${props.maxSpeed}km/hr`,
+      img: require('../../assets/electric_bike_black_48dp/2x/baseline_electric_bike_black_48dp.png' )
     }
-  }
+  ]
 
   _renderItem = ({item, index}) => {
     return (
@@ -48,20 +44,20 @@ export default class Metrics extends Component {
       </View>
     )
   }
- 
-  render () {
-    return (
-      <Carousel
-        ref={(c) => { this._carousel = c; }}
-        data={this.state.entries}
-        renderItem={this._renderItem}
-        sliderWidth={viewportWidth}
-        sliderHeight={100}
-        itemWidth={200}
-      />
-    )
-  }
+
+  return (
+    <Carousel
+      ref={(c) => { this._carousel = c; }}
+      data={entries}
+      renderItem={_renderItem}
+      sliderWidth={viewportWidth}
+      sliderHeight={100}
+      itemWidth={200}
+    />
+  )
 }
+
+export default Metrics
 
 const styles = StyleSheet.create({
   container: {
@@ -81,7 +77,8 @@ const styles = StyleSheet.create({
   info: {},
   title: {},
   value: {
-    fontSize: 20
+    fontSize: 20,
+    fontWeight: '500'
   },
   icon: {
     width: 30,

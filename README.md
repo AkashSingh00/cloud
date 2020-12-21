@@ -6,10 +6,10 @@ Prequisites
 react-native-cli: latest
 
 ```bash
-$ npm i react-native-cli
+$ npm i -g react-native-cli
 ```
 
-Make project
+This is how project was created (don't run this)
 ```bash
 $ react-native init Cloud --version 0.59.9
 ```
@@ -24,4 +24,15 @@ Create config.js in the root of this project and save your [Mapbox access token]
 export const config = {
   API_TOKEN: "your_mapbox_api_key_here",
 }
+```
+
+
+run app on development mode
+```js
+$ react-native run-android
+```
+
+logs
+```js
+$ react-native log-android
 ```

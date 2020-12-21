@@ -2,16 +2,16 @@ import React from 'react'
 import { View, StyleSheet, Text, Button, Image, Alert } from 'react-native'
 import Slider from 'react-native-unlock-slider'
 
-const Main = () => {
+const Main = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.navigator}>
         <View style={styles.direction}>
           <View style={styles.street}>
-            <Text style={{fontFamily: 'Roboto', fontSize: 22}}>Vijay Nagar</Text>
+            <Text style={{fontFamily: 'Roboto', fontSize: 25}}>{props.locality}</Text>
           </View>
           <View style={styles.coordinates}>
-            <Text style={{color: '#5E5F61', fontSize: 13}}>22.7196° N, 75.8577° E</Text>
+            <Text style={{color: '#5E5F61', fontSize: 13}}>{props.latitude}° N, {props.longitude}° E</Text>
           </View>
         </View>
         <View style={styles.start}>
@@ -20,9 +20,10 @@ const Main = () => {
               style={{
                 width: 20,
                 height: 20,
+                marginRight: 5
               }}
               source={require('../../assets/navigation_white_48dp/2x/baseline_navigation_white_48dp.png')}/>
-            <Text style={{color: 'white'}}>Start</Text>
+            <Text style={{color: 'white', marginRight: 6}}>Start</Text>
           </View>
         </View>
       </View>
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     display: "flex",
     flexDirection: "row",
-    justifyContent: 'center',
+    justifyContent: 'space-around',
   },
   emergency: {
     paddingTop: 5,

@@ -1,6 +1,7 @@
 import { config } from './config.js'
 
 import moment from 'moment'
+import axios from 'axios'
 
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, Vibration, PermissionsAndroid, Alert } from 'react-native'
@@ -19,14 +20,6 @@ MapboxGL.setTelemetryEnabled(false)
 const ROOT_URL = "https://api.mapbox.com/geocoding/v5"
 const SEARCH_ENDPOINT = "mapbox.places"
 
-const getCurrentLocality = async () => {
-  try {
-    let response = await fetch(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.latitude},${this.state.longitude}.json?types=locality&access_token=${config.API_TOKEN}`)
-    let json = await response.json()
-    return json.features[0].text
-  } catch (error) { console.error(error) }
-}
-
 export default class App extends Component {
 
   constructor() {
@@ -36,10 +29,10 @@ export default class App extends Component {
       startTime: new Date(),
       elapsedTime: '00:00:00',
       emergencyMessageSent: false,
-      street: 'Vijay Nagar',
-      longitude: 0.1278,
-      latitude: 51.5074,
-      permissionIsGranted: false
+      longitude: 0,
+      latitude: 0,
+      permissionIsGranted: false,
+      locality: 'Loading...'
     }
   }
 
@@ -62,10 +55,14 @@ export default class App extends Component {
     let counter = 0
 
     setInterval(() => {
+      axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
+        .then(response => this.setState({ locality: response.data.features[0].text }))
+        .catch(err => console.error(`ERROR: ${err}`))
+    }, 10000)
 
-      this.setState({ 
-        elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss')
-      })
+    setInterval(() => {
+
+      this.setState({ elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss') })
 
       if ( this.state.emergencyMessageSent ) {
         MusicControl.setNowPlaying({
@@ -111,7 +108,10 @@ export default class App extends Component {
             {this.state.permissionIsGranted && 
               <MapboxGL.UserLocation 
                 onUpdate={(data)=>{
-                  this.setState({ longitude: data.coords.longitude, latitude: data.coords.latitude })
+                  this.setState({ 
+                    longitude: data.coords.longitude, 
+                    latitude: data.coords.latitude
+                  })
                   this.camera.setCamera({
                     centerCoordinate: [data.coords.longitude, data.coords.latitude],
                     zoomLevel: 16,
@@ -126,8 +126,20 @@ export default class App extends Component {
         </View>
         <View style={styles.container}>
           <View style={styles.window}><Window /></View>
-          <View style={styles.metrics}><Metrics /></View>
-          <View style={styles.main}><Main /></View>
+          <View style={styles.metrics}>
+            <Metrics 
+              avgSpeed={22.32}
+              maxSpeed={26.92}
+              distance={12.56}
+              avgSpeed={22.32}
+              elapsedTime={this.state.elapsedTime} />
+          </View>
+          <View style={styles.main}>
+            <Main 
+              locality={this.state.locality}
+              longitude={this.state.longitude}
+              latitude={this.state.latitude} />
+          </View>
         </View>
       </View>
     );
