@@ -26,13 +26,15 @@ export default class App extends Component {
     super()
     this.state = {
       username: '___',
-      startTime: new Date(),
       elapsedTime: '00:00:00',
       emergencyMessageSent: false,
       longitude: 0,
       latitude: 0,
       permissionIsGranted: false,
-      locality: 'Loading...'
+      locality: 'Loading...',
+      navigationRunning: false,
+      timerCounter: 0,
+      interval: 0
     }
   }
 
@@ -52,10 +54,15 @@ export default class App extends Component {
 
     // VolumeControl.change(0.5)
 
+
+
     setInterval(() => {
       axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
         .then(response => this.setState({ locality: response.data.features[0].text }))
-        .catch(err => console.error(`ERROR: ${err}`))
+        .catch(err => {
+          this.setState({ locality: 'Loading...' })
+          console.error(`ERROR: ${err}`)
+        })
     }, 10000)
 
     const volumeListener = VolumeControlEvents.addListener("VolumeChanged", (event)=> {
@@ -71,29 +78,35 @@ export default class App extends Component {
   }
 
   startNavigation() {
-    let counter = 0
-    setInterval((counter) => {
-      this.setState({ elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss') })
-      MusicControl.setNowPlaying({
-        title: `${this.state.locality}`,
-        artist: `${this.state.elapsedTime}`
-      })
-    }, 1000)
+    this.setState({ navigationRunning: !this.state.navigationRunning })
+
+    var id
+    if (this.state.navigationRunning) {
+      console.log('stopped')
+      clearInterval(this.state.interval)
+    } else {
+      console.log('running')
+      let counter = 0
+      this.state.interval = setInterval(() => {
+        console.log(counter)
+        this.setState({ elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss') })
+        MusicControl.setNowPlaying({
+          title: `${this.state.locality}`,
+          artist: `${this.state.elapsedTime}`
+        })
+      }, 1000)
+    }
   }
 
   emergencyEvent() {
 
-    this.setState({ emergencyMessageSent: true })
+    this.setState({ timerCounter: 0, navigationRunning: false, emergencyMessageSent: true })
 
     Vibration.vibrate(1000)
 
-    const helpTex = `!!!EMERGENCY SOS!!!
-      ${this.state.username} has made an emergency trigger from this approximate location.
-      https://www.google.com/maps/@${this.state.latitude},${this.state.longitude},15z
-    `
+    const helpTex = `!!!EMERGENCY SOS!!!\n${this.state.username} has made an emergency trigger from this approximate location.\nhttps://www.google.com/maps/@${this.state.latitude},${this.state.longitude},15z`
 
-    SendSMS.send(123, "+919630997999", 
-      helpTex, (msg)=>{
+    SendSMS.send(123, "+919630997999", helpTex, (msg)=>{
       Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
     })
 

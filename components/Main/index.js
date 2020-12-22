@@ -1,8 +1,15 @@
 import React from 'react'
-import { View, StyleSheet, Text, Button, Image, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, Image, TouchableHighlight } from 'react-native'
 import Slider from 'react-native-unlock-slider'
 
+import Button from '../Button'
+
 const Main = (props) => {
+
+  const toggleNavigation = () => {
+    props.startNavigation()
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.navigator}>
@@ -15,18 +22,9 @@ const Main = (props) => {
           </View>
         </View>
         <View style={styles.start}>
-          <TouchableOpacity onPress={props.startNavigation}>
-            <View style={styles.button}>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginRight: 5
-                }}
-                source={require('../../assets/navigation_white_48dp/2x/baseline_navigation_white_48dp.png')}/>
-              <Text style={{color: 'white', marginRight: 6}}>Start</Text>
-            </View>
-          </TouchableOpacity>
+          <Button 
+            style={styles.button}
+            toggleNavigation={toggleNavigation}/>
         </View>
       </View>
       <View style={styles.emergency}>
@@ -34,9 +32,7 @@ const Main = (props) => {
           isLeftToRight={true}
           childrenContainer={{ backgroundColor: 'rgba(255, 255, 255, 0.0)' }}
           slideOverStyle={{ backgroundColor: '#F64C46' }}
-          onEndReached={() => {
-            props.emergencyEvent()
-          }}
+          onEndReached={() => props.emergencyEvent()}
           isOpacityChangeOnSlide={true}
           containerStyle={{
             backgroundColor: 'rgba(255,255,255,0.0)',
@@ -90,16 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    backgroundColor: "#1873FF",
     alignSelf: "flex-end",
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 25,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: 'space-around',
   },
   emergency: {
     paddingTop: 5,
