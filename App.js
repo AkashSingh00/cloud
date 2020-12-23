@@ -54,8 +54,6 @@ export default class App extends Component {
 
     // VolumeControl.change(0.5)
 
-
-
     setInterval(() => {
       axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
         .then(response => this.setState({ locality: response.data.features[0].text }))
@@ -118,13 +116,17 @@ export default class App extends Component {
 
   }
 
+  openOptions() {
+    console.log('openOptions')
+  }
+
   render() {
     return (
       <View style={styles.page}>
         <View style={styles.map}>
           <MapboxGL.MapView
             style={{flex: 1}}
-            styleURL={MapboxGL.StyleURL.Light}
+            styleURL={MapboxGL.StyleURL.Street}
             localizeLabels={true}
             compassEnabled={true}>
             {this.state.permissionIsGranted && 
@@ -136,24 +138,26 @@ export default class App extends Component {
                   })
                   this.camera.setCamera({
                     centerCoordinate: [data.coords.longitude, data.coords.latitude],
-                    zoomLevel: 16,
-                    animationDuration: 3000,
+                    animationDuration: 1000,
                   })
                 }}
               />
             }
             <MapboxGL.Camera 
-              ref={component => this.camera = component}/>
+              ref={component => this.camera = component}
+              zoomLevel={20} />
           </MapboxGL.MapView>
         </View>
         <View style={styles.container}>
-          <View style={styles.window}><Window /></View>
+          <View style={styles.window}>
+            <Window openOptions={this.openOptions.bind(this)} />
+          </View>
           <View style={styles.metrics}>
             <Metrics 
-              avgSpeed={22.32}
-              maxSpeed={26.92}
-              distance={12.56}
-              avgSpeed={22.32}
+              avgSpeed={0}
+              maxSpeed={0}
+              distance={0}
+              avgSpeed={0}
               elapsedTime={this.state.elapsedTime} />
           </View>
           <View style={styles.main}>

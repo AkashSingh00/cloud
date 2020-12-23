@@ -7,8 +7,12 @@ const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window'
 
 const Metrics = (props) => {
 
-  // this.setState({entries[2].value: this.props.elapsedTime})
   const entries = [
+    {
+      title: "Estimated Time",
+      value: `${props.elapsedTime}`,
+      img: require('../../assets/schedule_black_48dp/2x/baseline_schedule_black_48dp.png' )
+    },
     {
       title: "Avg Speed",
       value: `${props.avgSpeed}km/hr`,
@@ -18,11 +22,6 @@ const Metrics = (props) => {
       title: "Distance",
       value: `${props.distance}km`,
       img: require('../../assets/theaters_black_48dp/2x/baseline_theaters_black_48dp.png' )
-    },
-    {
-      title: "Estimated Time",
-      value: `${props.elapsedTime}`,
-      img: require('../../assets/schedule_black_48dp/2x/baseline_schedule_black_48dp.png' )
     },
     {
       title: "Max Speed",
