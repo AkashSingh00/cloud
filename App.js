@@ -4,15 +4,26 @@ import moment from 'moment'
 import axios from 'axios'
 
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, Vibration, PermissionsAndroid, Alert } from 'react-native'
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  Vibration, 
+  PermissionsAndroid, 
+  Alert,
+  Dimensions 
+} from 'react-native'
+
 import VolumeControl, { VolumeControlEvents } from 'react-native-volume-control'
 import MusicControl from 'react-native-music-control'
 import MapboxGL from '@react-native-mapbox-gl/maps'
+import RBSheet from 'react-native-raw-bottom-sheet'
 import SendSMS from 'react-native-sms-x'
 
 import Main from './components/Main'
 import Metrics from './components/Metrics'
 import Window from './components/Window'
+import Menu from './components/Menu'
 
 MapboxGL.setAccessToken(`${config.API_TOKEN}`)
 MapboxGL.setTelemetryEnabled(false)
@@ -20,12 +31,14 @@ MapboxGL.setTelemetryEnabled(false)
 const ROOT_URL = "https://api.mapbox.com/geocoding/v5"
 const SEARCH_ENDPOINT = "mapbox.places"
 
+const { height: viewportHeight } = Dimensions.get('window')
+
 export default class App extends Component {
 
   constructor() {
     super()
     this.state = {
-      username: '___',
+      username: 'test',
       elapsedTime: '00:00:00',
       emergencyMessageSent: false,
       longitude: 0,
@@ -33,8 +46,26 @@ export default class App extends Component {
       permissionIsGranted: false,
       locality: 'Loading...',
       navigationRunning: false,
-      timerCounter: 0,
-      interval: 0
+      interval: 0,
+      contacts: [{ name: "Aniruddha", number: "+919630997999" }],
+      route:         {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [ -151.5129, 63.1016, 0.0 ],
+            [ -150.4048, 63.1224, 105.5 ],
+            [ -151.3597, 63.0781, 0.0 ],
+            [ -118.497, 34.299667, 7.64 ],
+            [ -87.6901, 12.0623, 46.41 ],
+            [ -151.5053, 63.0719, 0.0 ],
+            [ -178.4576, -20.2873, 614.26 ],
+            [ -148.789, 63.1725, 7.5 ],
+            [ -120.993164, 36.421833, 6.37 ]
+          ],
+        }
+      }
     }
   }
 
@@ -52,7 +83,7 @@ export default class App extends Component {
     .then( granted => this.setState({ permissionIsGranted: granted }) )
     .catch( err => console.warn(err) )
 
-    // VolumeControl.change(0.5)
+    VolumeControl.change(0.5)
 
     setInterval(() => {
       axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
@@ -98,14 +129,16 @@ export default class App extends Component {
 
   emergencyEvent() {
 
-    this.setState({ timerCounter: 0, navigationRunning: false, emergencyMessageSent: true })
+    this.setState({ navigationRunning: false, emergencyMessageSent: true })
 
     Vibration.vibrate(1000)
 
     const helpTex = `!!!EMERGENCY SOS!!!\n${this.state.username} has made an emergency trigger from this approximate location.\nhttps://www.google.com/maps/@${this.state.latitude},${this.state.longitude},15z`
 
-    SendSMS.send(123, "+919630997999", helpTex, (msg)=>{
-      Alert.alert('Emergency Alert', 'Message Sent to Emergency Contacts.')
+    this.state.contacts.map(contact => {
+      SendSMS.send(parseFloat(contact.number), contact.number, helpTex, msg => {
+        Alert.alert('Emergency Alert', `Message sent successfully to ${contact.name} from your emergency contacts.`)
+      })
     })
 
     MusicControl.setNowPlaying({
@@ -116,19 +149,37 @@ export default class App extends Component {
 
   }
 
-  openOptions() {
-    console.log('openOptions')
+  updateContacts() {
+    console.log('updateContacts')
+  }
+
+  openMenu() {
+    this.RBSheet.open()
   }
 
   render() {
     return (
       <View style={styles.page}>
+        <RBSheet
+          ref={ref => this.RBSheet = ref}
+          dragFromTopOnly={true}
+          height={viewportHeight}
+          customStyles={{ wrapper: { backgroundColor: "transparent" }, draggableIcon: { backgroundColor: "#000" } }}>
+          <Menu />
+        </RBSheet>
         <View style={styles.map}>
           <MapboxGL.MapView
             style={{flex: 1}}
-            styleURL={MapboxGL.StyleURL.Street}
+            styleURL={MapboxGL.StyleURL.Streets}
             localizeLabels={true}
             compassEnabled={true}>
+            {
+            // <MapboxGL.ShapeSource
+            //   id='route'
+            //   shape={this.state.route}>
+            //   <MapboxGL.CircleLayer  id='linelayer1' style={{lineColor:'red'}} />
+            // </MapboxGL.Animated.ShapeSource>
+            }
             {this.state.permissionIsGranted && 
               <MapboxGL.UserLocation 
                 onUpdate={(data)=>{
@@ -141,16 +192,18 @@ export default class App extends Component {
                     animationDuration: 1000,
                   })
                 }}
-              />
-            }
+            />}
             <MapboxGL.Camera 
               ref={component => this.camera = component}
+              centerCoordinate={[this.state.longitude, this.state.latitude]}
               zoomLevel={20} />
           </MapboxGL.MapView>
         </View>
         <View style={styles.container}>
           <View style={styles.window}>
-            <Window openOptions={this.openOptions.bind(this)} />
+            <Window 
+              openMenu={this.openMenu.bind(this)}
+              updateContacts={this.updateContacts.bind(this)} />
           </View>
           <View style={styles.metrics}>
             <Metrics 
@@ -213,3 +266,4 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(241, 243, 241, 1)"
   }
 });
+

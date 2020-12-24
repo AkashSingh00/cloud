@@ -1,12 +1,20 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, Dimensions } from 'react-native'
+import { 
+  View, 
+  StyleSheet, 
+  Text, 
+  Image,
+  TouchableOpacity, 
+  ScrollView, 
+  Dimensions 
+} from 'react-native'
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window')
+const { width: viewportWidth } = Dimensions.get('window')
 
 import History from './History'
 import Contacts from './Contacts'
 
-const Options = (props) => {
+const Menu = (props) => {
 
   const [active, setActiveState] = useState("historyActive")
   const [newScreenPos, setScreenState] = useState(viewportWidth)
@@ -19,25 +27,26 @@ const Options = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.optionsTitle}>
-      <TouchableOpacity onPress={toggleActiveState}>
-        <Text style={
-          [styles.title, {color: `${active === "historyActive" ? "black" : "#dedede"}`}]
-        }>History</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={toggleActiveState}>
-        <Text style={
-          [styles.title, {color: `${active === "contactsActive" ? "black" : "#dedede"}`}]
-        }>Contacts</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={toggleActiveState}>
+          <Text style={
+            [styles.title, {color: `${active === "historyActive" ? "black" : "#dedede"}`}]
+          }>History</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleActiveState}>
+          <Text style={
+            [styles.title, {color: `${active === "contactsActive" ? "black" : "#dedede"}`}]
+          }>Contacts</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.optionsScene}>
         <ScrollView 
           ref={ref => this.ScrollView = ref}
           horizontal={true}
           pagingEnabled={true}
+          scrollEnabled={false}
           showsHorizontalScrollIndicator={false}>
           <History/>
-          <Contacts/>
+          <Contacts />
         </ScrollView>
       </View>
     </View>
@@ -66,8 +75,7 @@ const styles = StyleSheet.create({
   },
   optionsScene: {
     flexGrow: 1,
-    backgroundColor: "yellow"
   },
 })
 
-export default Options
+export default Menu

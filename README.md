@@ -26,15 +26,14 @@ export const config = {
 }
 ```
 
-
 run app on development mode
 ```js
-$ react-native run-android
+$ yarn dev
 ```
 
 logs
 ```js
-$ react-native log-android
+$ yarn log
 ```
 
 build apk

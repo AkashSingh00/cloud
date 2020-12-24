@@ -5,7 +5,9 @@
   "scripts": {
     "postinstall-disabled": "npx jetify",
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "dev": "react-native run-android",
+    "log": "react-native log-android"
   },
   "dependencies": {
     "@react-native-mapbox-gl/maps": "7.0.1",

@@ -11,7 +11,7 @@ const Button = (props) => {
 
   const toggle = () => {
     props.toggleNavigation()
-    setToggleState(toggleState === "Start" ? "Done" : "Start")
+    setToggleState(toggleState === "Start" ? "End" : "Start")
     setBgColor(bgColor === "#1873FF" ? "rgba(255, 255, 255, 0.8)" : "#1873FF")
     setBorderColor(borderColor === "#1873FF" ? "rgba(0, 0, 0, 0.3)" : "#1873FF")
     setTextColor(textColor === "white" ? "black" : "white")
