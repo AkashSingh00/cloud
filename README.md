@@ -76,6 +76,6 @@ android {
     ...
 }
 EOF
-$ ./android/gradlew assembleRelease
-$ adb install -r ./android/app/build/outputs/apk/release/app-release.apk
+$ cd android && ./gradlew assembleRelease
+$ adb install -r ./app/build/outputs/apk/release/app-release.apk
 ```

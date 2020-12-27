@@ -1,37 +1,50 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { 
   View, 
   StyleSheet, 
-  Text, 
+  Text,
   Dimensions, 
   TextInput,
+  Alert,
 } from 'react-native'
+
+import SubmitButton from './Button'
+
+import isPhoneNumber from 'is-phone'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const { width: viewportWidth } = Dimensions.get('window')
 
-const Section = ({contact}) => {
-  const { id } = contact
-  const [name, onChangeName] = useState(contact.name)
-  const [number, onChangeNumber] = useState(contact.number)
+const Section = (props) => {
+  const [name, onChangeName] = useState("")
+  const [number, onChangeNumber] = useState("")
+  const [contact, onChangeContact] = useState(props.contact)
+
+  const onChangeText = (id, type, text) => {
+    if ( type == "name" ) onChangeContact( contact => { return { ...contact, id: id, name: text } })
+    else if ( type == "number" ) onChangeContact( contact => { return { ...contact, id: id, number: text } })
+  }
+
+  useEffect(()=>props.onNewEntry(contact))
 
   return (
     <View style={styles.section}>
-      <Text style={styles.header}>Contact #{id}</Text>
+      <Text style={styles.header}>Contact #{contact.id}</Text>
       <View style={styles.body}>
         <View style={styles.input}>
           <Text>Name</Text>
           <TextInput
             style={styles.textInput}
-            onChangeText={text => onChangeName(text)}
-            value={name}
+            onChangeText={text => onChangeText(contact.id, "name", text)}
+            value={contact.name}
           />
         </View>
         <View style={styles.input}>
           <Text>Number</Text>
           <TextInput
             style={styles.textInput}
-            onChangeText={text => onChangeNumber(text)}
-            value={number}
+            onChangeText={text => onChangeText(contact.id, "number", text)}
+            value={contact.number}
           />
         </View>
       </View>
@@ -40,31 +53,43 @@ const Section = ({contact}) => {
 }
 
 const Contacts = (props) => {
-  const contacts = [
-    { 
-      id: 1,
-      name: 'Aniruddha',
-      number: '+919630997999',
-    },
-    { 
-      id: 2,
-      name: '',
-      number: '',
+
+  const contacts = props.contacts
+  const submit = () => {
+    console.log('submit')
+    const value = JSON.stringify(contacts)
+    try {
+      AsyncStorage
+        .setItem('contacts', value)
+        .then(() => {
+          console.log(value)
+          Alert.alert('Contact Saved!')
+        })
+    } catch (e) {
+      Alert.alert('Error', `${e}`)
     }
-  ]
+  }
 
-
-  // const addSection = () => {
-  //   console.log('addSection')
-  //   contacts.push({ 
-  //     id: contacts.length + 1, 
-  //     data: [ { title: 'Name', value: '' }, { title: 'Number', value: '' } ]
-  //   })
-  // }
+  const onNewEntry = (contact) => {
+    console.log(`${contact.name}, ${contact.number}`)
+    if (isPhoneNumber(contact.number)) {
+      console.log(`is number`)
+      contacts[contact.id] = {
+        id: contact.id,
+        name: contact.name,
+        number: contact.number
+      }
+    }
+  }
 
   return (
     <View style={[styles.container, {width: viewportWidth}]}>
-      {contacts.map(contact => <Section key={contact.id} contact={contact} />)}
+      <View style={styles.main}>
+        {props.contacts.map(contact => <Section key={contact.id} contact={contact} onNewEntry={onNewEntry} />)}
+      </View>
+      <SubmitButton 
+        title="Save"
+        submit={submit} />
     </View>
   )
 }
@@ -73,7 +98,7 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "flex-start",
+    justifyContent: "space-around",
     paddingLeft: 10,
     paddingRight: 10,
     paddingTop: 10,

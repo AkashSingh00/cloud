@@ -46,7 +46,8 @@ const Menu = (props) => {
           scrollEnabled={false}
           showsHorizontalScrollIndicator={false}>
           <History/>
-          <Contacts />
+          <Contacts
+            contacts={props.contacts} />
         </ScrollView>
       </View>
     </View>
