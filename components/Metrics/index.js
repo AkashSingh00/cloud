@@ -2,10 +2,21 @@ import React, { Component } from 'react'
 import { View, StyleSheet, Text, Button, Image, Alert, Dimensions } from 'react-native'
 
 import Carousel from 'react-native-snap-carousel'
+import { round } from '@turf/helpers'
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window')
 
 const Metrics = (props) => {
+
+  const formatDistance = (d) => {
+    var distance = round(d * 1000, 1)
+    var unit = ""
+    if ( distance > 1000 ) {
+      unit = "km"
+      distance = round(distance / 1000, 1)
+    } else unit = "m"
+    return `${distance}${unit}`
+  }
 
   const entries = [
     {
@@ -15,17 +26,17 @@ const Metrics = (props) => {
     },
     {
       title: "Avg Speed",
-      value: `${props.avgSpeed}km/hr`,
+      value: `${props.avgSpeed}m/s`,
       img: require('../../assets/directions_bike_black_48dp/2x/baseline_directions_bike_black_48dp.png' )
     },
     {
       title: "Distance",
-      value: `${props.distance}km`,
+      value: `${formatDistance(props.distance)}`,
       img: require('../../assets/theaters_black_48dp/2x/baseline_theaters_black_48dp.png' )
     },
     {
       title: "Max Speed",
-      value: `${props.maxSpeed}km/hr`,
+      value: `${props.maxSpeed}m/s`,
       img: require('../../assets/electric_bike_black_48dp/2x/baseline_electric_bike_black_48dp.png' )
     }
   ]

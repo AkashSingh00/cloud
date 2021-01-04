@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, StyleSheet, Text, Image, TouchableHighlight } from 'react-native'
 import Slider from 'react-native-unlock-slider'
+import { round } from '@turf/helpers'
 
 import Button from '../Button'
 
@@ -18,7 +19,7 @@ const Main = (props) => {
             <Text style={{fontFamily: 'Roboto', fontSize: 25}}>{props.locality}</Text>
           </View>
           <View style={styles.coordinates}>
-            <Text style={{color: '#5E5F61', fontSize: 13}}>{props.latitude}° N, {props.longitude}° E</Text>
+            <Text style={{color: '#5E5F61', fontSize: 13}}>{round(props.latitude, 4)}° N, {round(props.longitude, 4)}° E</Text>
           </View>
         </View>
         <View style={styles.start}>

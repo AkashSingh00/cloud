@@ -4,6 +4,10 @@ import moment from 'moment'
 import axios from 'axios'
 import isPhoneNumber from 'is-phone'
 
+import length from '@turf/length'
+import { lineString, round } from '@turf/helpers'
+import cleanCoords from '@turf/clean-coords'
+
 import React, { Component } from 'react'
 import { 
   StyleSheet, 
@@ -41,17 +45,26 @@ export default class App extends Component {
     this.volumeListener = {}
     this.state = {
       username: 'test',
-      elapsedTime: '00:00:00',
       emergencyMessageSent: false,
+
+      elapsedTime: '00:00:00',
       longitude: 0,
       latitude: 0,
+      altitude: 0,
+      heading: 0,
+      accuracy: 0,
+      speed: 0,
+      maxSpeed: 0,
+      distance: 0,
+      coordinates: [],
+
       permissionIsGranted: false,
       locality: 'Loading...',
       navigationRunning: false,
       interval: 0,
       contacts: [],
       contactsDefault: [ { id: 0, name: "", number: "" }, { id: 1, name: "", number: "" } ],
-      route:         {
+      route: {
         type: 'Feature',
         properties: {},
         geometry: {
@@ -99,14 +112,14 @@ export default class App extends Component {
       this.setState({ contacts: this.state.contactsDefault })
     }
 
-    // setInterval(() => {
-    //   axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
-    //     .then(response => this.setState({ locality: response.data.features[0].text }))
-    //     .catch(err => {
-    //       this.setState({ locality: 'Loading...' })
-    //       console.error(`ERROR: ${err}`)
-    //     })
-    // }, 10000)
+    setInterval(() => {
+      axios.get(`${ROOT_URL}/${SEARCH_ENDPOINT}/${this.state.longitude},${this.state.latitude}.json?types=locality&access_token=${config.API_TOKEN}`)
+        .then(response => this.setState({ locality: response.data.features[0].text }))
+        .catch(err => {
+          this.setState({ locality: 'Loading...' })
+          console.error(`ERROR: ${err}`)
+        })
+    }, 10000)
 
     this.volumeListener = VolumeControlEvents.addListener("VolumeChanged", (event)=> {
       if ( event.volume <= 0 && !this.state.emergencyMessageSent) {
@@ -122,6 +135,7 @@ export default class App extends Component {
 
   startNavigation() {
     this.setState({ navigationRunning: !this.state.navigationRunning })
+  	this.setState({ speed: 0, maxSpeed: 0, coordinates: [] })
 
     var id
     if (this.state.navigationRunning) {
@@ -131,7 +145,6 @@ export default class App extends Component {
       console.log('running')
       let counter = 0
       this.state.interval = setInterval(() => {
-        console.log(counter)
         this.setState({ elapsedTime: moment().hour(0).minute(0).second(counter++).format('HH:mm:ss') })
         MusicControl.setNowPlaying({
           title: `${this.state.locality}`,
@@ -181,38 +194,48 @@ export default class App extends Component {
             contacts={this.state.contacts} />
         </RBSheet>
         {
-        // <View style={styles.map}>
-        //   <MapboxGL.MapView
-        //     style={{flex: 1}}
-        //     styleURL={MapboxGL.StyleURL.Streets}
-        //     localizeLabels={true}
-        //     compassEnabled={true}>
-        //     {
-        //     // <MapboxGL.ShapeSource
-        //     //   id='route'
-        //     //   shape={this.state.route}>
-        //     //   <MapboxGL.CircleLayer  id='linelayer1' style={{lineColor:'red'}} />
-        //     // </MapboxGL.Animated.ShapeSource>
-        //     }
-        //     {this.state.permissionIsGranted && 
-        //       <MapboxGL.UserLocation 
-        //         onUpdate={(data)=>{
-        //           this.setState({ 
-        //             longitude: data.coords.longitude, 
-        //             latitude: data.coords.latitude
-        //           })
-        //           this.camera.setCamera({
-        //             centerCoordinate: [data.coords.longitude, data.coords.latitude],
-        //             animationDuration: 1000,
-        //           })
-        //         }}
-        //     />}
-        //     <MapboxGL.Camera 
-        //       ref={component => this.camera = component}
-        //       centerCoordinate={[this.state.longitude, this.state.latitude]}
-        //       zoomLevel={20} />
-        //   </MapboxGL.MapView>
-        // </View>
+        <View style={styles.map}>
+          <MapboxGL.MapView
+            style={{flex: 1}}
+            styleURL={MapboxGL.StyleURL.Streets}
+            localizeLabels={true}
+            compassEnabled={true}>
+            {
+            // <MapboxGL.ShapeSource
+            //   id='route'
+            //   shape={this.state.route}>
+            //   <MapboxGL.CircleLayer  id='linelayer1' style={{lineColor:'red'}} />
+            // </MapboxGL.Animated.ShapeSource>
+            }
+            {this.state.permissionIsGranted && 
+              <MapboxGL.UserLocation 
+                onUpdate={({timestamp, coords})=>{
+                	{this.state.navigationRunning && this.setState({
+                		coordinates: this.state.coordinates.concat([[coords.longitude, coords.latitude]]),
+                	})}
+							    this.setState({
+							      latitude: coords.latitude,
+							      longitude: coords.longitude,
+							      altitude: coords.altitude,
+							      heading: coords.heading,
+							      accuracy: coords.accuracy,
+							      speed: coords.speed,
+							      maxSpeed: (coords.speed > this.state.maxSpeed) ? coords.speed : this.state.maxSpeed,
+							      distance: (this.state.navigationRunning) ? length(cleanCoords(lineString(this.state.coordinates))) : 0
+							    })
+                  this.camera.setCamera({
+                    centerCoordinate: [coords.longitude, coords.latitude],
+                    animationDuration: 1000,
+                  })
+							    // console.log(`distance: ${JSON.stringify(this.state.speed)}`)
+                }}
+            />}
+            <MapboxGL.Camera 
+              ref={component => this.camera = component}
+              centerCoordinate={[this.state.longitude, this.state.latitude]}
+              zoomLevel={18} />
+          </MapboxGL.MapView>
+        </View>
         }
         <View style={styles.container}>
           <View style={styles.window}>
@@ -221,8 +244,8 @@ export default class App extends Component {
           </View>
           <View style={styles.metrics}>
             <Metrics 
-              avgSpeed={0} maxSpeed={0}
-              distance={0} avgSpeed={0}
+              avgSpeed={this.state.speed} maxSpeed={this.state.maxSpeed}
+              distance={this.state.distance}
               elapsedTime={this.state.elapsedTime} />
           </View>
           <View style={styles.main}>

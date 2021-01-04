@@ -1006,6 +1006,14 @@
     "@turf/helpers" "6.x"
     "@turf/invariant" "6.x"
 
+"@turf/clean-coords@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@turf/clean-coords/-/clean-coords-6.0.1.tgz#162eb24c33bb3d484efaf3298787909498a9bc81"
+  integrity sha512-qpPT+YqWHIKCC0ryIhcle7nEVqJJ6RhEZNVy5t/PyzR+E8Q+RRAeiMCaPjLnT7Rem8VPOcF+bBoCdub1KyHhdw==
+  dependencies:
+    "@turf/helpers" "6.x"
+    "@turf/invariant" "6.x"
+
 "@turf/destination@6.x":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@turf/destination/-/destination-6.0.1.tgz#5275887fa96ec463f44864a2c17f0b712361794a"
@@ -1022,7 +1030,7 @@
     "@turf/helpers" "6.x"
     "@turf/invariant" "6.x"
 
-"@turf/helpers@6.x", "@turf/helpers@>= 4.6.0 <7.0.0":
+"@turf/helpers@6.x", "@turf/helpers@>= 4.6.0 <7.0.0", "@turf/helpers@^6.1.4":
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-6.1.4.tgz#d6fd7ebe6782dd9c87dca5559bda5c48ae4c3836"
   integrity sha512-vJvrdOZy1ngC7r3MDA7zIGSoIgyrkWcGnNIEaqn/APmw+bVLF2gAW7HIsdTxd12s5wQMqEpqIQrmrbRRZ0xC7g==
@@ -1031,6 +1039,22 @@
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-6.1.2.tgz#6013ed6219f9ac2edada9b31e1dfa5918eb0a2f7"
   integrity sha512-WU08Ph8j0J2jVGlQCKChXoCtI50BB3yEH21V++V0T4cR1T27HKCxkehV2sYMwTierfMBgjwSwDIsxnR4/2mWXg==
+  dependencies:
+    "@turf/helpers" "6.x"
+
+"@turf/length@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@turf/length/-/length-6.0.2.tgz#22d91a6d0174e862a3614865613f1aceb1162dac"
+  integrity sha512-nyfXMowVtX2dICEG7u7EGC2SMaauVUWIMc9eWQrEauNA/9aw+7wbiuip4GPBoyeXEUUekF0EOjJn5aB9Zc8CzA==
+  dependencies:
+    "@turf/distance" "6.x"
+    "@turf/helpers" "6.x"
+    "@turf/meta" "6.x"
+
+"@turf/meta@6.x":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@turf/meta/-/meta-6.0.2.tgz#eb92951126d24a613ac1b7b99d733fcc20fd30cf"
+  integrity sha512-VA7HJkx7qF1l3+GNGkDVn2oXy4+QoLP6LktXAaZKjuT1JI0YESat7quUkbCMy4zP9lAUuvS4YMslLyTtr919FA==
   dependencies:
     "@turf/helpers" "6.x"
 
